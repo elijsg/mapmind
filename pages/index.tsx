@@ -231,7 +231,7 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
     <div className="container mx-auto">
       <h1 className="text-4xl text-center font-bold mb-8">MindMap</h1>
       <p className="text-center text-sm text-gray-400 mb-6">
-      The help we provide depends entirely on how much you let us know! The more details the better. Please share as much as you're comfortable with.
+      The help we&apos;re able to provide depends entirely on how much you let us know! Please share as much as you&apos;re comfortable with.
     </p>
       {!isAssessmentSubmitted && (
   <form onSubmit={handleSubmit}>
