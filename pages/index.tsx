@@ -27,6 +27,8 @@ function Home(): JSX.Element {
   const [isAssessmentSubmitted, setIsAssessmentSubmitted] = useState(false);
   const [showInitialAssessment, setShowInitialAssessment] = useState(true);
   const [actionableAdvice, setActionableAdvice] = useState('');
+  const [showActionableAdvice, setShowActionableAdvice] = useState(false);
+
 
   const handleInputChange = useCallback(
     (index: number, value: string, type: string) => {
@@ -55,19 +57,22 @@ function Home(): JSX.Element {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+  
     console.log('API Key:', process.env.NEXT_PUBLIC_OPENAI_API_KEY);
-
+  
+    const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
+  
     const response = await axios.post(
       'https://api.openai.com/v1/engines/text-davinci-002/completions',
       {
-        prompt: `You have been tasked with providing me with advice in order to make their life better. Based on the following answers to 10 questions, please provide a personal, in-depth, and informative analysis of the top 3 areas of life I could work on the most, along with a brief explanation of why these areas were selected and what specific steps could be taken to help work on them, following this format: “Based on your answers, it seems like the three areas that could benefit from the most guidance and support are: [list the three areas here, separated by commas]. For [first area], guidance in this area could include [suggested actions for improvement]. For [second area], guidance in this area could include [suggested actions for improvement]. And for [third area], guidance in this area could include [suggested actions for improvement]
-        ${answers.join('\n')}
-        Areas of life: career development, personal growth, health and wellness, financial management, relationships, and education.
-    
-        Answers analysis:
-        `,
-        max_tokens: 300,
+        prompt: `Task: Provide the user with a personal, in-depth, and informative analysis of the top 3 areas of life where they could use the most guidance and support, along with a brief explanation of why these areas were selected and what specific steps could be taken to help work on them based off the following questions and answers. Use their responses to the questions to determine which 3 areas need the most help. Make your answer 200 words max. Provide the answer as if you were speaking directly to them (based on your answers, it seems like...).
+  
+  Questions and Answers:
+  ${initialQA}
+  
+  Areas of life: career development, personal growth, health and wellness, financial management, relationships, and education.
+   `,
+        max_tokens: 250,
       },
       {
         headers: {
@@ -76,21 +81,22 @@ function Home(): JSX.Element {
         },
       }
     );
-
+  
     setPlan(response.data.choices[0].text);
     setIsAssessmentSubmitted(true);
-  };
+  };  
 
   const handleAdditionalAnswersSubmit = async (additionalAnswers: Array<string>) => {
     try {
-      const initialAnswersText = answers.map((answer, index) => `Answer ${index + 1}: ${answer}`).join('\n');
-      const additionalAnswersText = additionalAnswers.map((answer, index) => `Additional answer ${index + 1}: ${answer}`).join('\n');
+      const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
+      const additionalQA = additionalAnswers.map((answer, index) => `Q${index + 11}: ${generatedQuestions[index]}\nA${index + 11}: ${answer}`).join('\n');
+  
       const response = await axios.post(
-      'https://api.openai.com/v1/engines/text-davinci-002/completions',
-  {
-    prompt: `Based on my answers to the initial 10 questions: \n${initialAnswersText}\nand the additional 6 questions: \n${additionalAnswersText}\n, please provide a short plan with actionable advice on what I can do to improve the areas identified in the initial assessment.`,
-    max_tokens: 500,
-  },
+        'https://api.openai.com/v1/engines/text-davinci-002/completions',
+        {
+          prompt: `Based on the user's answers to the initial survey: \n${initialQA}\n and their agreement with the assessment: ${isAssessmentConfirmed ? 'Yes' : 'No'}, along with their answers to the additional 6 questions: \n${additionalQA}\n, please provide a personalized plan with actionable advice on what they can do to improve the areas identified in the initial assessment. Provide the answer as if you were speaking directly to them.`,
+          max_tokens: 500,
+        },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -107,46 +113,19 @@ function Home(): JSX.Element {
     }
   };  
 
-  const questionsForArea = (area: string) => {
-    const questions: { [key: string]: string[]; } = {
-      "Career development": [
-        "Question 1 related to career development",
-        "Question 2 related to career development",
-      ],
-      "Personal growth": [
-        "Question 1 related to personal growth",
-        "Question 2 related to personal growth",
-      ],
-      "Health and wellness": [
-        "Question 1 related to health and wellness",
-        "Question 2 related to health and wellness",
-      ],
-      "Financial management": [
-        "Question 1 related to financial management",
-        "Question 2 related to financial management",
-      ],
-      "Relationships": [
-        "Question 1 related to relationships",
-        "Question 2 related to relationships",
-      ],
-      "Education": [
-        "Question 1 related to education",
-        "Question 2 related to education",
-      ],
-    };
-
-    return questions[area] || [];
-  };
-
   const generateAdditionalQuestions = async (assessment: string) => {
     try {
       const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
-
+  
       const response = await axios.post(
         'https://api.openai.com/v1/engines/text-davinci-002/completions',
         {
-          prompt: `Based on my answers to the questions asked here, ask me 6 more questions to dive deeper into the areas of life i need support and guidance with.
-            \n${initialQA}\n`,
+          prompt: `Hi ChatGPT, based on the user's initial answers to the following questions, please generate six additional questions that will help them dive deeper into the specific areas of their life that need support and guidance. Consider the information provided in their answers to generate personalized and relevant questions. Avoid asking similar questions. Focus on the areas where they face challenges or are working to improve.
+
+          Questions and Answers:
+          ${initialQA}
+          `,
+
           max_tokens: 300,
         },
         {
@@ -158,12 +137,12 @@ function Home(): JSX.Element {
       );
   
       const questions = response.data.choices[0].text.split('\n').filter((question: string) => question.trim() !== '');
-    setGeneratedQuestions(questions);
-  } catch (error) {
-    console.error('Error fetching additional questions:', error);
-    alert('An error occurred while fetching additional questions. Please try again.');
-  }
-};
+      setGeneratedQuestions(questions);
+    } catch (error) {
+      console.error('Error fetching additional questions:', error);
+      alert('An error occurred while fetching additional questions. Please try again.');
+    }
+  };  
 
   const AdditionalQuestions = memo(() => {
     const [localAdditionalAnswers, setLocalAdditionalAnswers] = useState(additionalAnswers);
@@ -178,6 +157,7 @@ function Home(): JSX.Element {
     const handleAdditionalSubmit = (e: FormEvent) => {
       e.preventDefault();
       handleAdditionalAnswersSubmit(localAdditionalAnswers);
+      setShowActionableAdvice(true);
     };
   
     const handleLocalInputChange = (index: number, value: string) => {
@@ -196,7 +176,7 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
             <input
               type="text"
               id={`additional-question-${index + 1}`}
-              className="border border-gray-280 rounded px-4 py-2 w-full mt-2"
+              className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
               value={localAdditionalAnswers[index]}
               key={index}
               ref={(input) => inputRefs.current[index] = input}
@@ -238,7 +218,7 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
               id={`general-question-${index + 1}`}
               value={generalAnswers[index]}
               ref={(input) => inputRefsGeneral.current[index] = input}
-              className="border border-gray-280 rounded px-4 py-2 w-full mt-2"
+              className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
               onFocus={() => setFocusedIndexGeneral(index)}
               onChange={(e) => handleInputChange(index, e.target.value, 'general')}
             />
@@ -262,7 +242,7 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
         <input
           type="text"
           id={`question-${index + 1}`}
-          className="border border-gray-280 rounded px-4 py-1 w-full mt-2"
+          className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
           value={answers[index]}
           onChange={(e) => handleInputChange(index, e.target.value, 'initial')}
         />
@@ -305,8 +285,8 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
       </div>
     )}
     {isAssessmentConfirmed === false && <GeneralQuestions />}
-    {showAdditionalQuestions && <AdditionalQuestions />}
-    {actionableAdvice && (
+    {showAdditionalQuestions && !showActionableAdvice && <AdditionalQuestions />}
+{actionableAdvice && showActionableAdvice && (
   <div>
     <h2 className="text-2xl font-bold mb-4 mt-8">Actionable Advice</h2>
     <p>{actionableAdvice}</p>
