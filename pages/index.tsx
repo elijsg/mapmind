@@ -185,6 +185,8 @@ function Home(): JSX.Element {
       newAnswers[index] = value;
       setLocalAdditionalAnswers(newAnswers);
     };
+
+AdditionalQuestions.displayName = 'AdditionalQuestions';
   
     return (
       <form onSubmit={handleAdditionalSubmit}>
