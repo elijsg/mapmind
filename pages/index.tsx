@@ -65,12 +65,8 @@ function Home(): JSX.Element {
     const response = await axios.post(
       'https://api.openai.com/v1/engines/text-davinci-002/completions',
       {
-        prompt: `Task: Provide the user with a personal, in-depth, and informative analysis of the top 3 areas of life where they could use the most guidance and support, along with a brief explanation of why these areas were selected and what specific steps could be taken to help work on them based off the following questions and answers. Use their responses to the questions to determine which 3 areas need the most help. Make your answer 200 words max. Provide the answer as if you were speaking directly to them (based on your answers, it seems like...).
-  
-  Questions and Answers:
-  ${initialQA}
-  
-  Areas of life: career development, personal growth, health and wellness, financial management, relationships, and education.
+        prompt: `You are a life coach who is going to analyze my life based on my answers to a set of questions. You need to determine which of these three categories you think I could use the most work on based on these answers: career development, personal growth, health and wellness, financial management, relationships, and education. Please take a look at my answers to the questions in the surevy. You must give me a personalized analysis outlining which three areas I likely need the most work on and tell me why you think this. Here are the questions and answers: 
+        ${initialQA}      
    `,
         max_tokens: 250,
       },
@@ -120,7 +116,7 @@ function Home(): JSX.Element {
       const response = await axios.post(
         'https://api.openai.com/v1/engines/text-davinci-002/completions',
         {
-          prompt: `Hi ChatGPT, based on the user's initial answers to the following questions, please generate six additional questions that will help them dive deeper into the specific areas of their life that need support and guidance. Consider the information provided in their answers to generate personalized and relevant questions. Avoid asking similar questions. Focus on the areas where they face challenges or are working to improve.
+          prompt: `You are a life coach who is attempting to learn about me in order to provide me with actionable life advice. First, you need to ask me 6 questions to get some more information. Based on my answers to the questions in the following survey, which 6 questions would you ask to dive deeper into the areas I’m struggling with?
 
           Questions and Answers:
           ${initialQA}
@@ -233,7 +229,10 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-4xl font-bold mb-8">MindMap</h1>
+      <h1 className="text-4xl text-center font-bold mb-8">MindMap</h1>
+      <p className="text-center text-sm text-gray-400 mb-6">
+      The help we provide depends entirely on how much you let us know! The more details the better. Please share as much as you're comfortable with.
+    </p>
       {!isAssessmentSubmitted && (
   <form onSubmit={handleSubmit}>
     {initialQuestions.map((question, index) => (
