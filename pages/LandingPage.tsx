@@ -25,7 +25,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
     >
       <div className="self-center">
         <p className="text-xl mb-8">
-          Welcome to MindMap! We're here to help you self reflect and take actionable steps to make life better. First, we need to ask you some questions...
+          Welcome to MindMap! We&apos;re here to help you self reflect and take actionable steps to make life better. First, we need to ask you some questions...
         </p>
         <button
   className={styles.homebutton}
