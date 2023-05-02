@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    font-family: 'Lato', sans-serif;
+  }
+
+  html, body {
+    margin: 0;
+    background-color: #182756; 
+    min-height: 100%;
+  }
+  

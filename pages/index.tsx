@@ -1,5 +1,14 @@
-import axios from 'axios';
 import { useState, useCallback, FormEvent, memo, useEffect, useRef} from 'react';
+import styles from './Home.module.css';
+import { Configuration, OpenAIApi } from "openai";
+import LandingPage from './LandingPage';
+import Header from './Header';
+import { EmailPopup } from '../components/EmailPopup';
+
+const configuration = new Configuration({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 const initialQuestions = [
   "What is your current occupation and how satisfied are you with it?",
@@ -28,7 +37,10 @@ function Home(): JSX.Element {
   const [showInitialAssessment, setShowInitialAssessment] = useState(true);
   const [actionableAdvice, setActionableAdvice] = useState('');
   const [showActionableAdvice, setShowActionableAdvice] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [showLandingPage, setShowLandingPage] = useState(true);
+  const [initialAssessment, setInitialAssessment] = useState('');
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
 
   const handleInputChange = useCallback(
     (index: number, value: string, type: string) => {
@@ -57,88 +69,82 @@ function Home(): JSX.Element {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
-    console.log('API Key:', process.env.NEXT_PUBLIC_OPENAI_API_KEY);
+
+    setIsLoading(true);
   
     const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
   
-    const response = await axios.post(
-      'https://api.openai.com/v1/engines/text-davinci-002/completions',
-      {
-        prompt: `You are a life coach who is going to analyze my life based on my answers to a set of questions. You need to determine which of these three categories you think I could use the most work on based on these answers: career development, personal growth, health and wellness, financial management, relationships, and education. Please take a look at my answers to the questions in the surevy. You must give me a personalized analysis outlining which three areas I likely need the most work on and tell me why you think this. Here are the questions and answers: 
-        ${initialQA}      
-   `,
-        max_tokens: 250,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
-        },
-      }
-    );
+    const completion = await openai.createChatCompletion({
+      model: "gpt-3.5-turbo",
+      temperature: 0.95,
+      max_tokens: 400,
+      messages: [
+        { role: "system", content: "You are a life coach analyzing my life based on my answers to a set of questions." },
+        { role: "user", content: `Analyze these answers:\n\n${initialQA}`},
+        { role: "user", content: `Consider these 6 areas of life: career development, personal growth, health and wellness, financial management, relationships, and education`},
+        { role: "system", content: "Based on my answers, what are the top 3 areas of life that could benefit from the most guidance and support? Please provide your answer in a numbered list."},
+      ],
+    });
   
-    setPlan(response.data.choices[0].text);
+    const plan = completion.data.choices?.[0]?.message?.content?.trim() || '';
+    setPlan(plan);
+    setInitialAssessment(plan);
+    setIsLoading(false);
     setIsAssessmentSubmitted(true);
-  };  
+  };
+  
 
   const handleAdditionalAnswersSubmit = async (additionalAnswers: Array<string>) => {
+    setIsLoading(true);
     try {
       const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
       const additionalQA = additionalAnswers.map((answer, index) => `Q${index + 11}: ${generatedQuestions[index]}\nA${index + 11}: ${answer}`).join('\n');
   
-      const response = await axios.post(
-        'https://api.openai.com/v1/engines/text-davinci-002/completions',
-        {
-          prompt: `Based on the user's answers to the initial survey: \n${initialQA}\n and their agreement with the assessment: ${isAssessmentConfirmed ? 'Yes' : 'No'}, along with their answers to the additional 6 questions: \n${additionalQA}\n, please provide a personalized plan with actionable advice on what they can do to improve the areas identified in the initial assessment. Provide the answer as if you were speaking directly to them.`,
-          max_tokens: 500,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
-          },
-        }
-      );
+      const completion = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        temperature: 0.95,
+        max_tokens: 500,
+        messages: [
+          { role: "system", content: "You are a life coach providing me with advice on how I can make my life better based on my answers to two sets of questions and my agreement with an assessment of my life." },
+          { role: "user", content: `Analyze my answers to an initial set of questions:\n\n${initialQA}` },
+          { role: "user", content: `Consider the fact that I agree with your initial assessment which was generated based on my answers to these initial questions: "${initialAssessment}"` },
+          { role: "user", content: `Analyze my answers to the additional questions:\n\n${additionalQA}` },
+          { role: "system", content: "Based on my answers to both sets of questions and my agreement with your assessment, what are some actionable steps I can take to improve the areas identified in the initial assessment?" },
+        ],
+      });
   
-      const advice = response.data.choices[0].text.trim();
+      const advice = completion.data.choices?.[0]?.message?.content?.trim() || '';
       setActionableAdvice(advice);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error sending additional answers:', error);
       alert('An error occurred while processing your additional answers. Please try again.');
     }
   };  
-
+  
   const generateAdditionalQuestions = async (assessment: string) => {
     try {
       const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
   
-      const response = await axios.post(
-        'https://api.openai.com/v1/engines/text-davinci-002/completions',
-        {
-          prompt: `You are a life coach who is attempting to learn about me in order to provide me with actionable life advice. First, you need to ask me 6 questions to get some more information. Based on my answers to the questions in the following survey, which 6 questions would you ask to dive deeper into the areas I’m struggling with?
-
-          Questions and Answers:
-          ${initialQA}
-          `,
-
-          max_tokens: 300,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
-          },
-        }
-      );
+      const completion = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        temperature: 0.95,
+        max_tokens: 300,
+        messages: [
+          { role: "system", content: "You are a life coach asking me questions to assess my life." },
+          { role: "user", content: `Analyze these answers to the initial set of questions:\n\n${initialQA}` },
+          { role: "user", content: `Consider the fact that I agree with your initial assessment which was generated based on my answers to these initial questions: "${initialAssessment}"` },
+          { role: "system", content: "Generate 6 additional questions related to my answers in the initial set of questions. Please provide them in a numbered list with the only text in your response being the answers themselves." },
+        ],
+      });
   
-      const questions = response.data.choices[0].text.split('\n').filter((question: string) => question.trim() !== '');
+      const questions = completion.data.choices?.[0]?.message?.content?.split('\n').filter((question: string) => question.trim() !== '') || [];
       setGeneratedQuestions(questions);
     } catch (error) {
       console.error('Error fetching additional questions:', error);
       alert('An error occurred while fetching additional questions. Please try again.');
     }
-  };  
+  };   
 
   const AdditionalQuestions = memo(() => {
     const [localAdditionalAnswers, setLocalAdditionalAnswers] = useState(additionalAnswers);
@@ -164,28 +170,32 @@ function Home(): JSX.Element {
 
 AdditionalQuestions.displayName = 'AdditionalQuestions';
   
-    return (
-      <form onSubmit={handleAdditionalSubmit}>
-        {generatedQuestions.map((question, index) => (
-          <div key={index}>
-            <label htmlFor={`additional-question-${index + 1}`}>{question}</label>
-            <input
-              type="text"
-              id={`additional-question-${index + 1}`}
-              className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
-              value={localAdditionalAnswers[index]}
-              key={index}
-              ref={(input) => inputRefs.current[index] = input}
-              onChange={(e) => handleLocalInputChange(index, e.target.value)}
-            />
-          </div>
-        ))}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
+return (
+  <div className="container mx-auto px-4">
+    <form onSubmit={handleAdditionalSubmit}>
+      {generatedQuestions.map((question, index) => (
+        <div key={index}>
+          <label htmlFor={`additional-question-${index + 1}`}>{question}</label>
+          <input
+            type="text"
+            id={`additional-question-${index + 1}`}
+            className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
+            value={localAdditionalAnswers[index]}
+            key={index}
+            ref={(input) => inputRefs.current[index] = input}
+            onChange={(e) => handleLocalInputChange(index, e.target.value)}
+          />
+        </div>
+      ))}
+      <div className={styles.buttonWrapper}>
+        <button type="submit" className="shadow__btn mt-4">
           Submit Additional Answers
         </button>
-      </form>
-    );
-  });  
+      </div>
+    </form>
+  </div>
+);
+});
   
   const GeneralQuestions = () => {
     const generalQuestions = [
@@ -220,75 +230,103 @@ AdditionalQuestions.displayName = 'AdditionalQuestions';
             />
           </div>
         ))}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
-          Submit General Answers
-        </button>
+        <div className={styles.buttonWrapper}>
+  <button type="submit" className="shadow__btn mb-4 mt-2">
+    Analyze Answers
+  </button>
+</div>
       </form>
     );
   };
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-4xl text-center font-bold mb-8">MindMap</h1>
-      <p className="text-center text-sm text-gray-400 mb-6">
-      The help we&apos;re able to provide depends entirely on how much you let us know! Please share as much as you&apos;re comfortable with.
-    </p>
-      {!isAssessmentSubmitted && (
-  <form onSubmit={handleSubmit}>
-    {initialQuestions.map((question, index) => (
-      <div key={index}>
-        <label htmlFor={`question-${index + 1}`}>{question}</label>
-        <input
-          type="text"
-          id={`question-${index + 1}`}
-          className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
-          value={answers[index]}
-          onChange={(e) => handleInputChange(index, e.target.value, 'initial')}
-        />
-      </div>
-    ))}
-    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
-      Analyze Answers
-    </button>
-  </form>
-)}
+    <div>
+      <Header />
+      {showLandingPage ? (
+        <LandingPage onStart={() => setShowLandingPage(false)} />
+      ) : (
+        <>
+          {isLoading ? (
+            <div className={styles.loader}>Thinking...</div>
+          ) : (
+            <div className="container mx-auto px-4">
+              {!isAssessmentSubmitted && !isLoading && (
+                <>
+                  <p className="text-center text-sm text-gray-400 mt-4 mb-6">
+                    The help we&apos;re able to provide depends entirely on how much you let us know! The more details you share, the better our help will be. Please share as much as you&apos;re comfortable with.
+                  </p>
+                  <form onSubmit={handleSubmit}>
+                    {initialQuestions.map((question, index) => (
+                      <div key={index}>
+                        <label htmlFor={`question-${index + 1}`}>{question}</label>
+                        <input
+                          type="text"
+                          id={`question-${index + 1}`}
+                          className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
+                          value={answers[index]}
+                          onChange={(e) => handleInputChange(index, e.target.value, 'initial')}
+                        />
+                      </div>
+                    ))}
+                    <div className={styles.buttonWrapper}>
+                      <button type="submit" className="shadow__btn mt-4 mb-6">
+                        Analyze My Answers
+                      </button>
+                    </div>
+                  </form>
+                </>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    
          {isAssessmentSubmitted && (
       <div>
         {showInitialAssessment && (
           <>
-            <h2 className="text-2xl font-bold mb-4">ChatGPT Analysis</h2>
-            <p>{plan}</p>
-            <h2 className="text-2xl font-bold mb-4 mt-8">Is this assessment accurate?</h2>
-            <button
-              className="bg-green-500 text-white px-4 py-2 rounded mt-4 mr-4"
-              onClick={() => {
-                setIsAssessmentConfirmed(true);
-                setShowAdditionalQuestions(true);
-                generateAdditionalQuestions(plan);
-                setShowInitialAssessment(false);
-              }}
-            >
-              Yes
-            </button>
-            <button
-              className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-              onClick={() => {
-                setIsAssessmentConfirmed(false);
-                setShowInitialAssessment(false);
-              }}
-            >
-              No
-            </button>
+            <h2 className="text-2xl font-bold text-center mb-1">MindMap Analysis</h2>
+            <p className="text-xl mb-4 text-center">This is just a first guess to see where we stand. If we get this right, we&apos;ll ask you a few more questions to get a better idea of how we can help.</p>
+            <p className="bg-slate-900 {plan} text-white border border-gray-700 px-4 py-2 rounded mb-4 text-center">{plan}</p>
+            <h2 className="text-2xl font-bold mt-6 text-center">Is this assessment accurate?</h2>
+            <div className={`${styles.buttonWrapper} ${styles.yesNoButtons}`}>
+  <button
+    className="bg-green-500 text-white px-4 py-2 rounded mt-4 mr-4"
+    onClick={async () => {
+      setIsLoading(true);
+      setIsAssessmentConfirmed(true);
+      setShowInitialAssessment(false);
+      await generateAdditionalQuestions(plan);
+      setIsLoading(false);
+      setShowAdditionalQuestions(true);
+    }}       
+  >
+    Yes
+  </button>
+  <button
+    className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+    onClick={() => {
+      setIsLoading(true);
+      setIsAssessmentConfirmed(false);
+      setShowInitialAssessment(false);
+      setIsLoading(false);
+    }}    
+  >
+    No
+  </button>
+</div>
           </>
         )}
       </div>
     )}
     {isAssessmentConfirmed === false && <GeneralQuestions />}
     {showAdditionalQuestions && !showActionableAdvice && <AdditionalQuestions />}
-{actionableAdvice && showActionableAdvice && (
-  <div>
-    <h2 className="text-2xl font-bold mb-4 mt-8">Actionable Advice</h2>
-    <p>{actionableAdvice}</p>
+    {actionableAdvice && showActionableAdvice && (
+  <div className="container mx-auto px-4">
+    <div>
+      <h2 className="text-2xl font-bold text-center mb-4 mt-8">Actionable Advice</h2>
+      <p className={`bg-slate-900 ${actionableAdvice} text-white border border-gray-700 px-4 py-2 rounded mb-4 text-center`}>{actionableAdvice}</p>
+    </div>
   </div>
 )}
   </div>

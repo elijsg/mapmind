@@ -1,5 +1,7 @@
 import '2/styles/globals.css';
 import type { AppProps } from 'next/app';
+import './buttons.css';
+import './Home.module.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

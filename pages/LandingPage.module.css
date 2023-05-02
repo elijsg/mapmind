@@ -1,0 +1,92 @@
+.landing-enter {
+    opacity: 0;
+  }
+  
+  .landing-enter-active {
+    opacity: 1;
+    transition: opacity 600ms;
+  }
+  
+  .landing-exit {
+    opacity: 1;
+  }
+  
+  .landing-exit-active {
+    opacity: 0;
+    transition: opacity 600ms;
+  }
+  
+  .homebutton {
+    position: relative;
+    padding: 10px 20px;
+    border-radius: 7px;
+    border: 1px solid rgb(61, 106, 255);
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 2px;
+    background: transparent;
+    color: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 0 0 0 transparent;
+    -webkit-transition: all 1s ease-in;
+    -moz-transition: all 1s ease-in;
+    transition: all 1s ease-in;
+  }
+  
+  .homebutton:hover {
+    background: rgb(61, 106, 255);
+    box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815);
+    -webkit-transition: all 1s ease-out;
+    -moz-transition: all 1s ease-out;
+    transition: all 1s ease-out;
+  }
+  
+  .homebutton:hover::before {
+    -webkit-animation: sh02 1s 0s linear;
+    -moz-animation: sh02 1s 0s linear;
+    animation: sh02 1s 0s linear;
+  }
+  
+  .homebutton::before {
+    content: '';
+    display: block;
+    width: 0px;
+    height: 86%;
+    position: absolute;
+    top: 7%;
+    left: 0%;
+    opacity: 0;
+    background: #89a7f4;
+    box-shadow: 0 0 50px 30px #89a7f4;
+    -webkit-transform: skewX(-20deg);
+    -moz-transform: skewX(-20deg);
+    -ms-transform: skewX(-20deg);
+    -o-transform: skewX(-20deg);
+    transform: skewX(-20deg);
+  }
+  
+  @keyframes sh02 {
+    from {
+      opacity: 0;
+      left: 0%;
+    }
+  
+    50% {
+      opacity: 1;
+    }
+  
+    to {
+      opacity: 0;
+      left: 100%;
+    }
+  }
+  
+  .homebutton:active {
+    box-shadow: 0 0 0 0 transparent;
+    -webkit-transition: box-shadow 1s ease-in;
+    -moz-transition: box-shadow 1s ease-in;
+    transition: box-shadow 1s ease-in;
+  }
+  
+  
