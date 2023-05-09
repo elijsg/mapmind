@@ -340,3 +340,7 @@
 .customInput {
   max-width: 600px;
 }
+
+.grid-rows-layout {
+  grid-template-rows: auto 1fr auto;
+}

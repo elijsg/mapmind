@@ -3,7 +3,6 @@ import styles from './Home.module.css';
 import { Configuration, OpenAIApi } from "openai";
 import LandingPage from './LandingPage';
 import Header from './Header';
-import { EmailPopup } from '../components/EmailPopup';
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -11,16 +10,16 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const initialQuestions = [
-  "What is your current occupation and how satisfied are you with it?",
+  "What are the top 3 priorities in your life right now?",
   "Do you feel like you have a good work-life balance? Why or why not?",
-  "How often do you engage in physical activity or exercise?",
-  "How would you rate your current level of financial stability?",
-  "Have you recently experienced any major life changes or events?",
-  "Do you have any personal goals that you are currently working towards?",
-  "How would you rate the current state of your personal relationships?",
-  "What are some challenges or obstacles that you are currently facing in your life?",
-  "Have you ever sought professional help or guidance in any of the areas listed above?",
-  "How much time do you typically dedicate to self-improvement or personal development activities?",
+  "What habits or routines do you currently have in place that support your goals and priorities?",
+  "Are there any habits or routines that you believe are holding you back from achieving your goals? If so, what are they?",
+  "How do you manage stress or difficult situations in your life?",
+  "What do you believe are your personal strengths, and how do they help you achieve your goals?",
+  "If you could change one decision you made in the past, what would it be and why? How do you think it would impact your life today?",
+  "Imagine you have a year off from all obligations and unlimited resources. How would you spend that time?",
+  "If you were to describe your life as a book without using your name, what would the title and the main theme be? What would you like the next chapter to be about?",
+  "Think about a person you admire or who inspires you. What qualities do they possess that you would like to cultivate in yourself?",
 ];
 
 function Home(): JSX.Element {
@@ -41,6 +40,7 @@ function Home(): JSX.Element {
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [initialAssessment, setInitialAssessment] = useState('');
   const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [email, setEmail] = useState("");
 
   const handleInputChange = useCallback(
     (index: number, value: string, type: string) => {
@@ -80,9 +80,10 @@ function Home(): JSX.Element {
       max_tokens: 400,
       messages: [
         { role: "system", content: "You are a life coach analyzing my life based on my answers to a set of questions." },
+        { role: "system", content: "I am a client who is seeking personalized guidance and support in my life based on my answers to a set of questions." },
         { role: "user", content: `Analyze these answers:\n\n${initialQA}`},
         { role: "user", content: `Consider these 6 areas of life: career development, personal growth, health and wellness, financial management, relationships, and education`},
-        { role: "system", content: "Based on my answers, what are the top 3 areas of life that could benefit from the most guidance and support? Please provide your answer in a numbered list."},
+        { role: "system", content: "Based on my answers, what are the top 3 areas of life that could benefit from the most guidance and support? Please provide your answer in a numbered list. Please be as creative as possible and provide ideas that they may not have thought of before"},
       ],
     });
   
@@ -93,6 +94,29 @@ function Home(): JSX.Element {
     setIsAssessmentSubmitted(true);
   };
   
+  const generateAdditionalQuestions = async (assessment: string) => {
+    try {
+      const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
+  
+      const completion = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo", //CHANGE BACK TO 4
+        temperature: 0.95,
+        max_tokens: 300,
+        messages: [
+          { role: "system", content: "You are a life coach asking me questions to assess my life." },
+          { role: "user", content: `Analyze these answers to the initial set of questions:\n\n${initialQA}` },
+          { role: "user", content: `Consider the fact that I agree with your initial assessment which was generated based on my answers to these initial questions: "${initialAssessment}"` },
+          { role: "system", content: "Generate 6 additional questions related to my answers in the initial set of questions. Please provide them in a numbered list with the only text in your response being the answers themselves." },
+        ],
+      });
+  
+      const questions = completion.data.choices?.[0]?.message?.content?.split('\n').filter((question: string) => question.trim() !== '') || [];
+      setGeneratedQuestions(questions);
+    } catch (error) {
+      console.error('Error fetching additional questions:', error);
+      alert('An error occurred while fetching additional questions. Please try again.');
+    }
+  };   
 
   const handleAdditionalAnswersSubmit = async (additionalAnswers: Array<string>) => {
     setIsLoading(true);
@@ -101,7 +125,7 @@ function Home(): JSX.Element {
       const additionalQA = additionalAnswers.map((answer, index) => `Q${index + 11}: ${generatedQuestions[index]}\nA${index + 11}: ${answer}`).join('\n');
   
       const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo", //CHANGE BACK TO 4
         temperature: 0.95,
         max_tokens: 500,
         messages: [
@@ -121,30 +145,30 @@ function Home(): JSX.Element {
       alert('An error occurred while processing your additional answers. Please try again.');
     }
   };  
+
+  const handleEmailSubmit = async (e: FormEvent) => {
+    e.preventDefault();
   
-  const generateAdditionalQuestions = async (assessment: string) => {
     try {
-      const initialQA = answers.map((answer, index) => `Q${index + 1}: ${initialQuestions[index]}\nA${index + 1}: ${answer}`).join('\n');
-  
-      const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        temperature: 0.95,
-        max_tokens: 300,
-        messages: [
-          { role: "system", content: "You are a life coach asking me questions to assess my life." },
-          { role: "user", content: `Analyze these answers to the initial set of questions:\n\n${initialQA}` },
-          { role: "user", content: `Consider the fact that I agree with your initial assessment which was generated based on my answers to these initial questions: "${initialAssessment}"` },
-          { role: "system", content: "Generate 6 additional questions related to my answers in the initial set of questions. Please provide them in a numbered list with the only text in your response being the answers themselves." },
-        ],
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
       });
   
-      const questions = completion.data.choices?.[0]?.message?.content?.split('\n').filter((question: string) => question.trim() !== '') || [];
-      setGeneratedQuestions(questions);
+      if (response.ok) {
+        alert("Email sent successfully");
+        setShowEmailPopup(false);
+      } else {
+        alert("Error sending email");
+      }
     } catch (error) {
-      console.error('Error fetching additional questions:', error);
-      alert('An error occurred while fetching additional questions. Please try again.');
+      console.error("Error:", error);
+      alert("Error sending email");
     }
-  };   
+  };  
 
   const AdditionalQuestions = memo(() => {
     const [localAdditionalAnswers, setLocalAdditionalAnswers] = useState(additionalAnswers);
@@ -320,15 +344,57 @@ return (
       </div>
     )}
     {isAssessmentConfirmed === false && <GeneralQuestions />}
-    {showAdditionalQuestions && !showActionableAdvice && <AdditionalQuestions />}
-    {actionableAdvice && showActionableAdvice && (
+{showAdditionalQuestions && !showActionableAdvice && <AdditionalQuestions />}
+{actionableAdvice && showActionableAdvice && (
   <div className="container mx-auto px-4">
     <div>
       <h2 className="text-2xl font-bold text-center mb-4 mt-8">Actionable Advice</h2>
       <p className={`bg-slate-900 ${actionableAdvice} text-white border border-gray-700 px-4 py-2 rounded mb-4 text-center`}>{actionableAdvice}</p>
     </div>
+    <div className="flex justify-center">
+      <button
+        className={`bg-blue-500 text-white px-4 py-2 rounded mt-4 ${styles.buttonWrapper} shadow__btn`}
+        onClick={() => setShowEmailPopup(true)}
+      >
+        Get Personalized Support
+      </button>
+    </div>
   </div>
 )}
+{showEmailPopup && (
+  <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+    <form
+      onSubmit={handleEmailSubmit}
+      className="bg-slate-900 text-white border border-gray-700 rounded p-6 w-1/2 max-w-lg"
+    >
+      <h2 className="text-xl mb-4">Email:</h2>
+      <input
+        type="email"
+        required
+        className="bg-gray-200 text-gray-900 border border-gray-300 rounded px-4 py-2 w-full mb-4"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <div className="flex justify-center">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Submit
+        </button>
+        <button
+          type="button"
+          className="bg-red-500 text-white px-4 py-2 rounded ml-4"
+          onClick={() => setShowEmailPopup(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+)}
+
+
   </div>
 )};
 
