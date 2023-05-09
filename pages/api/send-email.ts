@@ -3,7 +3,7 @@ import sgMail from "@sendgrid/mail";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const sendEmail = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const { email } = req.body;
 
@@ -27,3 +27,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({ error: "Method not allowed" });
   }
 };
+
+export default sendEmail;

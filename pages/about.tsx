@@ -22,7 +22,7 @@ const AboutPage = () => {
             <p className="mb-4">
               At MindMap, we believe that everyone has the potential to live
               their best life, but sometimes we all need a little help getting
-              there. That's why we've created a platform that combines
+              there. That&apos;s why we&apos;ve created a platform that combines
               cutting-edge technology with the expertise of our team of experts
               to provide you with the tools and resources you need to achieve
               your goals.
@@ -32,20 +32,20 @@ const AboutPage = () => {
               Our platform uses artificial intelligence and machine learning to
               analyze your responses to our initial questions, and then
               provides you with personalized guidance and support based on your
-              unique needs and preferences. We're constantly improving our
+              unique needs and preferences. We&apos;re constantly improving our
               platform to ensure that it provides the most relevant and
               effective support possible.
             </p>
 
             <p className="mb-4">
-              We're passionate about helping our users live their best lives,
-              and we're committed to providing you with the best possible
-              experience. We're always here to answer your questions and provide
+              We&apos;re passionate about helping our users live their best lives,
+              and we&apos;re committed to providing you with the best possible
+              experience. We&apos;re always here to answer your questions and provide
               support whenever you need it.
             </p>
 
             <p className="font-semibold">
-              Thank you for choosing MindMap. Let's work together to achieve
+              Thank you for choosing MindMap. Let&apos;s work together to achieve
               your goals and create a better future!
             </p>
           </div>
