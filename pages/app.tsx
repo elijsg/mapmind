@@ -1,9 +1,11 @@
-import { useState, useCallback, FormEvent, memo, useEffect, useRef} from 'react';
+import { useState, useCallback, FormEvent, memo, useEffect, useRef, useContext} from 'react';
 import styles from '../CSS/app.module.css';
 import { Configuration, OpenAIApi } from "openai";
 import Header from '../components/Header';
 import { extractRelevantTopics } from './extract';
+import { useRouter } from 'next/router';
 import { searchTopics } from './search';
+import { GlobalStateContext } from '../context/GlobalStateContext';
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -45,6 +47,8 @@ function Home(): JSX.Element {
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [showSupportButton, setShowSupportButton] = useState(false);
+  const { setAdvice } = useContext(GlobalStateContext);
+  const router = useRouter();
 
   const handleInputChange = useCallback(
     (index: number, value: string, type: string) => {
@@ -121,6 +125,7 @@ function Home(): JSX.Element {
       alert('An error occurred while fetching additional questions. Please try again.');
     }
   };   
+  
 
   const handleAdditionalAnswersSubmit = async (additionalAnswers: Array<string>) => {
     setIsLoading(true);
@@ -143,6 +148,10 @@ function Home(): JSX.Element {
 
       const advice = completion.data.choices?.[0]?.message?.content?.trim() || '';
       setActionableAdvice(advice);
+
+      setAdvice(advice);
+      router.push('/advice');
+
       setShowSupportButton(true);
 
     } catch (error) {
