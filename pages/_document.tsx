@@ -12,7 +12,7 @@ class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <link
-            href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap"
             rel="stylesheet"
           />
           <Script
@@ -35,6 +35,7 @@ class MyDocument extends Document {
       </Html>
     );
   }
-}
+  
+  }
 
 export default MyDocument;

@@ -1,18 +1,19 @@
 import React from "react";
-import styles from "./AboutPage.module.css";
-import Header from "./Header";
+import styles from "../CSS/AboutPage.module.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const AboutPage = () => {
   return (
     <>
       <Header/>
         <h1 className={styles.pageTitle}>About Us</h1>   
-      <div className={`${styles.container} min-h-screen`}>
-        <div className="w-full text-center py-6"></div>
+      <div className={`${styles.container} flex-grow`}>
+        <div className="w-full text-center py-1"></div>
         <div className="flex flex-col items-center justify-center">
           <div className={`max-w-2xl ${styles.content}`}>
             <p className="font-semibold text-lg mb-4">
-              Welcome to MindMap, a personalized coaching and support platform
+              MindMap is a personalized coaching and support platform
               designed to help you live your best life. Our mission is to
               empower you to take control of your life by providing personalized
               guidance and support to help you achieve your goals and improve
@@ -30,7 +31,7 @@ const AboutPage = () => {
 
             <p className="mb-4">
               Our platform uses artificial intelligence and machine learning to
-              analyze your responses to our initial questions, and then
+              analyze your responses to questions, and then
               provides you with personalized guidance and support based on your
               unique needs and preferences. We&apos;re constantly improving our
               platform to ensure that it provides the most relevant and
@@ -51,6 +52,7 @@ const AboutPage = () => {
           </div>
         </div>
       </div>
+      <Footer className="bg-slate-900 text-white h-14" />
     </>
   );
 };

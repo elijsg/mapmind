@@ -6,7 +6,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ className }) => {
   return (
-    <footer className={`bg-transparent text-white py-4 fixed bottom-0 left-0 w-full ${className}`}>
+<footer className={`bg-transparent text-white py-4 bottom-0 left-0 w-full ${className}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link href="/about" passHref>
           <button className="font-bold focus:outline-none">About</button>

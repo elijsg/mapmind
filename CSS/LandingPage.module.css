@@ -22,9 +22,7 @@
   border-radius: 7px;
   border: 1px solid rgb(61, 106, 255);
   font-size: 14px;
-  text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 2px;
   background: transparent;
   color: #ffffff;
   overflow: hidden;
@@ -90,5 +88,9 @@
 }
 
 .container {
-  position: fixed;
-}
+  height: 10em;
+  display: flex;
+  align-items: center;
+  justify-content: center }
+.container p {
+  margin: 0 }

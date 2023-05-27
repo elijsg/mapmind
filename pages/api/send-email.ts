@@ -5,14 +5,14 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 const sendEmail = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const { email } = req.body;
+    const { email, subject, text } = req.body;
 
     const msg = {
       to: email,
       from: "support@mymindmap.ca", 
-      subject: "Personalized Support",
-      text: "Here is your personalized support...",
-      html: "<strong>Here is your personalized support...</strong>",
+      subject: subject,
+      text: text,
+      html: `<strong>${text}</strong>`,
     };
 
     try {
@@ -29,3 +29,4 @@ const sendEmail = async (req: NextApiRequest, res: NextApiResponse) => {
 };
 
 export default sendEmail;
+
