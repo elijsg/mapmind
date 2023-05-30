@@ -2,9 +2,7 @@ import { useState, useCallback, FormEvent, memo, useEffect, useRef, useContext} 
 import styles from '../CSS/app.module.css';
 import { Configuration, OpenAIApi } from "openai";
 import Header from '../components/Header';
-import { extractRelevantTopics } from './extract';
 import { useRouter } from 'next/router';
-import { searchTopics } from './search';
 import { GlobalStateContext } from '../context/GlobalStateContext';
 
 const configuration = new Configuration({
@@ -40,13 +38,7 @@ function Home(): JSX.Element {
   const [actionableAdvice, setActionableAdvice] = useState('');
   const [showActionableAdvice, setShowActionableAdvice] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showLandingPage, setShowLandingPage] = useState(true);
   const [initialAssessment, setInitialAssessment] = useState('');
-  const [showEmailPopup, setShowEmailPopup] = useState(false);
-  const [email, setEmail] = useState("");
-  const [searchResults, setSearchResults] = useState<any>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showSupportButton, setShowSupportButton] = useState(false);
   const { setAdvice } = useContext(GlobalStateContext);
   const router = useRouter();
 
@@ -142,7 +134,7 @@ function Home(): JSX.Element {
           { role: "user", content: `Analyze my answers to an initial set of questions:\n\n${initialQA}` },
           { role: "user", content: `Consider the fact that I agree with your initial assessment which was generated based on my answers to these initial questions: "${initialAssessment}"` },
           { role: "user", content: `Analyze my answers to the additional questions:\n\n${additionalQA}` },
-          { role: "system", content: "Based on my answers to both sets of questions and my agreement with your assessment, what are some actionable steps I can take to improve the areas identified in the initial assessment?" },
+          { role: "system", content: "Based on my answers to both sets of questions and my agreement with your assessment, what are some actionable steps I can take to improve in the 3 the areas identified in the initial assessment?" },
         ],
       });
 
@@ -152,45 +144,11 @@ function Home(): JSX.Element {
       setAdvice(advice);
       router.push('/advice');
 
-      setShowSupportButton(true);
-
     } catch (error) {
       console.error('Error sending additional answers:', error);
       alert('An error occurred while processing your additional answers. Please try again.');
     } finally {
       setIsLoading(false);
-    }
-};
-
-
-  const handleEmailSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-  
-    const formattedResults = JSON.stringify(searchResults, null, 2);
-
-    try {
-      const response = await fetch("/api/send-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          email, 
-          subject: 'Your Personalized Support Information', 
-          text: `Here is your advice:\n\n${actionableAdvice}\n\nHere are some additional resources:\n\n${formattedResults}`
-        }),
-      });
-  
-      if (response.ok) {
-        alert("Email sent successfully");
-        setShowEmailPopup(false);
-        setEmail('');
-      } else {
-        alert("Error sending email");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error sending email");
     }
 };
 
@@ -312,7 +270,7 @@ return (
                     />
                   </div>
                 ))}
-                <div className={styles.buttonWrapper}>
+                <div className={styles.buttonWrapper} justify-center>
                   <button type="submit" className="shadow__btn mt-4 mb-6">
                     Analyze My Answers
                   </button>
@@ -355,95 +313,20 @@ return (
     }}    
   >
     No
-  </button>
+    </button>
 </div>
           </>
         )}
       </div>
     )}
-    {isAssessmentConfirmed === false && <GeneralQuestions />}
+     {isAssessmentConfirmed === false && <GeneralQuestions />}
 {showAdditionalQuestions && !showActionableAdvice && <AdditionalQuestions />}
 {actionableAdvice && showActionableAdvice && (
   <div className="container mx-auto px-4">
-    <div>
-      <h2 className="text-2xl font-bold text-center mb-4 mt-8">Actionable Advice</h2>
-      <p className={`bg-slate-900 ${actionableAdvice} text-white border border-gray-700 px-4 py-2 rounded mb-4 text-center`}>{actionableAdvice}</p>
-    </div>
-    {showSupportButton && !isSearching && ( 
     <div className="flex justify-center">
-      <button
-        className={`bg-blue-500 text-white px-4 py-2 rounded mt-4 ${styles.buttonWrapper} shadow__btn`}
-        onClick={async () => {
-          const topics = await extractRelevantTopics(actionableAdvice);
-          const results = await searchTopics(topics);
-          setSearchResults(results);
-        }}
-      >
-        Get Personalized Support
-      </button>
     </div>
-    )}
-    {isSearching && <div>Loading search results...</div>}
-{searchResults && (
-    <div>
-    <h2>Search Results</h2>
-    {searchResults.map((result: any, index: number) => (
-      <div key={index}>
-        <h3>{result.title}</h3>
-        <a href={result.link} target="_blank" rel="noopener noreferrer">{result.link}</a>
-      </div>
-  ))}
-</div>
-    )}
-    {searchResults && !showSupportButton && (
-      <div className="flex justify-center">
-        <button
-          className={`bg-blue-500 text-white px-4 py-2 rounded mt-4 ${styles.buttonWrapper} shadow__btn`}
-          onClick={() => {setShowSupportButton(false);setShowEmailPopup(true)}}
-        >
-          Send These to Me!
-        </button>
-      </div>
-    )}
   </div>
 )}
-{showEmailPopup && (
-  <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-    <form
-      onSubmit={handleEmailSubmit}
-      className="bg-slate-900 text-white border border-gray-700 rounded p-6 w-1/2 max-w-lg"
-    >
-      <h2 className="text-xl mb-4">Email:</h2>
-      <input
-        type="email"
-        required
-        className="bg-gray-200 text-gray-900 border border-gray-300 rounded px-4 py-2 w-full mb-4"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <div className="flex justify-center">
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Submit
-        </button>
-        <button
-  type="button"
-  className="bg-red-500 text-white px-4 py-2 rounded ml-4"
-  onClick={() => {
-    setSearchResults(null);
-    setShowEmailPopup(false);
-  }}
->
-  Cancel
-</button>
-      </div>
-    </form>
-  </div>
-)}
-
-
   </div>
 )};
 

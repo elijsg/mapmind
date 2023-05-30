@@ -11,7 +11,7 @@ const Home: React.FC = () => {
   const handleClick = (e: MouseEvent) => {
     setIsFading(true);
     setTimeout(() => {
-      router.push("/app");
+      router.push("/analysis");
     }, 1000);
   };
 

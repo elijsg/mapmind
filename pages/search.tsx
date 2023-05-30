@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export async function searchTopics(topics: string[]) {
-  const searchResults = []; 
+  const searchResults: string[] = []; 
 
   for (const topic of topics) {
     try {
@@ -9,11 +9,16 @@ export async function searchTopics(topics: string[]) {
         params: {
           key: 'AIzaSyB1NEXcMVl19HfU-WqcZNeGqMnXn1xgDao',
           cx: '476a87d3f5e864ad3',
-          q: topic
+          q: topic,
+          num: 1 
         }
       });
 
-      searchResults.push(response.data.items);
+      if (response.data.items && response.data.items.length > 0) {
+        const item = response.data.items[0]; 
+        searchResults.push(`${item.title}\n${item.link}`);
+      }
+
     } catch (error) {
       console.error(`Error searching for topic ${topic}:`, error);
     }
