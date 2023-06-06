@@ -1,7 +1,66 @@
 .shadow__btn {
+  position: relative;
+  padding: 10px 20px;
+  border-radius: 7px;
+  border: 1px solid rgba(98, 131, 221, 0);
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(37deg, rgba(121,224,194,1) 1%, rgba(67,175,216,1) 16%, rgba(98,131,221,1) 30%, rgba(224,90,142,1) 41%, rgba(228,99,115,1) 53%, rgba(239,147,111,1) 65%, rgba(242,188,99,1) 74%, rgba(244,114,78,1) 83%, rgba(233,69,113,1) 100%);
+  background-size: 1800% 1800%;
+
+  -webkit-animation: rainbow 18s ease infinite;
+  -moz-animation: rainbow 18s ease infinite;
+  -o-animation: rainbow 18s ease infinite;
+  animation: rainbow 18s ease infinite;
+
+  position: relative;
+
+  z-index: 1;
+}
+
+.shadow__btn::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: inherit;
+  z-index: -1;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.shadow__btn:hover::before {
+  opacity: 1;
+  filter: blur(8px);
+}
+
+@-webkit-keyframes rainbow {
+    0%{background-position:0% 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0% 82%}
+}
+
+@-moz-keyframes rainbow {
+    0%{background-position:0% 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0% 82%}
+}
+
+@-o-keyframes rainbow {
+    0%{background-position:0% 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0% 82%}
+}
+
+@keyframes rainbow {
+    0%{background-position:0% 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0% 82%}
+}
+
+.feedback__btn {
   padding: 10px 20px;
   border: none;
-  font-size: 15px;
+  font-size: 12px;
   font-family: 'Inter', sans-serif;
   color: #fff;
   border-radius: 7px;
@@ -10,86 +69,14 @@
   transition-property: box-shadow;
 }
 
-.shadow__btn {
+.feedback__btn {
   background: rgb(0,140,255);
-  box-shadow: 0 0 25px rgb(0,140,255);
+  box-shadow: 0 0 8px rgb(0,140,255);
 }
 
-.shadow__btn:hover {
-  box-shadow: 0 0 5px rgb(0,140,255),
-              0 0 25px rgb(0,140,255),
-              0 0 50px rgb(0,140,255),
-              0 0 100px rgb(0,140,255);
-}
-
-.homebutton {
-  position: relative;
-  padding: 10px 20px;
-  border-radius: 7px;
-  border: 1px solid rgb(61, 106, 255);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  background: transparent;
-  color: #fff;
-  overflow: hidden;
-  box-shadow: 0 0 0 0 transparent;
-  -webkit-transition: all 0.2s ease-in;
-  -moz-transition: all 0.2s ease-in;
-  transition: all 0.2s ease-in;
-}
-
-.homebutton:hover {
-  background: rgb(61, 106, 255);
-  box-shadow: 0 0 30px 5px rgba(0, 142, 236, 0.815);
-  -webkit-transition: all 0.2s ease-out;
-  -moz-transition: all 0.2s ease-out;
-  transition: all 0.2s ease-out;
-}
-
-.homebutton:hover::before {
-  -webkit-animation: sh02 0.5s 0s linear;
-  -moz-animation: sh02 0.5s 0s linear;
-  animation: sh02 0.5s 0s linear;
-}
-
-.homebutton::before {
-  content: '';
-  display: block;
-  width: 0px;
-  height: 86%;
-  position: absolute;
-  top: 7%;
-  left: 0%;
-  opacity: 0;
-  background: #fff;
-  box-shadow: 0 0 50px 30px #fff;
-  -webkit-transform: skewX(-20deg);
-  -moz-transform: skewX(-20deg);
-  -ms-transform: skewX(-20deg);
-  -o-transform: skewX(-20deg);
-  transform: skewX(-20deg);
-}
-
-@keyframes sh02 {
-  from {
-    opacity: 0;
-    left: 0%;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-    left: 100%;
-  }
-}
-
-.homebutton:active {
-  box-shadow: 0 0 0 0 transparent;
-  -webkit-transition: box-shadow 0.2s ease-in;
-  -moz-transition: box-shadow 0.2s ease-in;
-  transition: box-shadow 0.2s ease-in;
+.feedback__btn:hover {
+  box-shadow: 0 0 8px rgb(0,140,255),
+              0 0 8px rgb(0,140,255),
+              0 0 8px rgb(0,140,255),
+              0 0 8px rgb(0,140,255);
 }

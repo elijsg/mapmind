@@ -1,9 +1,10 @@
-import { useState, useCallback, FormEvent, memo, useEffect, useRef, useContext} from 'react';
+import React, { useState, useCallback, FormEvent, memo, useEffect, useRef, useContext} from 'react';
 import styles from '../CSS/app.module.css';
 import { Configuration, OpenAIApi } from "openai";
 import Header from '../components/Header';
 import { useRouter } from 'next/router';
 import { GlobalStateContext } from '../context/GlobalStateContext';
+import TextareaAutosize from 'react-textarea-autosize';
 
 const configuration = new Configuration({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -24,6 +25,7 @@ const initialQuestions = [
 ];
 
 function Home(): JSX.Element {
+  console.log('Rendering Home component...');
   const [answers, setAnswers] = useState<Array<string>>(Array(10).fill(''));
   const [plan, setPlan] = useState('');
   const [isAssessmentConfirmed, setIsAssessmentConfirmed] = useState<boolean | null>(null);
@@ -41,6 +43,10 @@ function Home(): JSX.Element {
   const [initialAssessment, setInitialAssessment] = useState('');
   const { setAdvice } = useContext(GlobalStateContext);
   const router = useRouter();
+
+  useEffect(() => {
+    console.log('Home component rerendered');
+  }, []);
 
   const handleInputChange = useCallback(
     (index: number, value: string, type: string) => {
@@ -77,10 +83,10 @@ function Home(): JSX.Element {
     const completion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       temperature: 0.95,
-      max_tokens: 400,
+      max_tokens: 300,
       messages: [
         { role: "system", content: "You are a life coach analyzing my life based on my answers to a set of questions." },
-        { role: "system", content: "I am a client who is seeking personalized guidance and support in my life based on my answers to a set of questions." },
+        { role: "system", content: "I am seeking personalized guidance and support in my life based on my answers to a set of questions." },
         { role: "user", content: `Analyze these answers:\n\n${initialQA}`},
         { role: "user", content: `Consider these 6 areas of life: career development, personal growth, health and wellness, financial management, relationships, and education`},
         { role: "system", content: "Based on my answers, what are the top 3 areas of life that could benefit from the most guidance and support? Please provide your answer in a numbered list. Please be as creative as possible and provide ideas that they may not have thought of before"},
@@ -128,7 +134,7 @@ function Home(): JSX.Element {
       const completion = await openai.createChatCompletion({
         model: "gpt-3.5-turbo", //CHANGE BACK TO 4
         temperature: 0.95,
-        max_tokens: 400,
+        max_tokens: 300,
         messages: [
           { role: "system", content: "You are a life coach providing me with advice on how I can make my life better based on my answers to two sets of questions and my agreement with an assessment of my life." },
           { role: "user", content: `Analyze my answers to an initial set of questions:\n\n${initialQA}` },
@@ -152,56 +158,66 @@ function Home(): JSX.Element {
     }
 };
 
-  const AdditionalQuestions = memo(() => {
-    const [localAdditionalAnswers, setLocalAdditionalAnswers] = useState(additionalAnswers);
-    const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+const AdditionalQuestions = memo(() => {
+  const [localAdditionalAnswers, setLocalAdditionalAnswers] = useState(additionalAnswers);
   
-    useEffect(() => {
-      if (focusedIndex !== null && inputRefs.current[focusedIndex]) {
-        inputRefs.current[focusedIndex]?.focus();
-      }
-    }, [focusedIndex]);
-  
-    const handleAdditionalSubmit = (e: FormEvent) => {
-      e.preventDefault();
-      handleAdditionalAnswersSubmit(localAdditionalAnswers);
-      setShowActionableAdvice(true);
-    };
-  
-    const handleLocalInputChange = (index: number, value: string) => {
-      const newAnswers = [...localAdditionalAnswers];
-      newAnswers[index] = value;
-      setLocalAdditionalAnswers(newAnswers);
-    };
+  const inputRefs = useRef<React.RefObject<HTMLTextAreaElement>[]>([]);
 
-AdditionalQuestions.displayName = 'AdditionalQuestions';
+  useEffect(() => {
+    inputRefs.current = generatedQuestions.map(
+      (_, i) => inputRefs.current[i] ?? React.createRef()
+    );    
+  }, [generatedQuestions]);
+
+  useEffect(() => {
+    if (focusedIndex !== null && inputRefs.current[focusedIndex]) {
+      inputRefs.current[focusedIndex]?.current?.focus();
+    }
+  }, [focusedIndex]);
+
+  const handleAdditionalSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    handleAdditionalAnswersSubmit(localAdditionalAnswers);
+    setShowActionableAdvice(true);
+  };
   
-return (
-  <div className="container mx-auto px-4">
-    <form onSubmit={handleAdditionalSubmit}>
-      {generatedQuestions.map((question, index) => (
-        <div key={index}>
-          <label htmlFor={`additional-question-${index + 1}`}>{question}</label>
-          <input
-            type="text"
-            id={`additional-question-${index + 1}`}
-            className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
-            value={localAdditionalAnswers[index]}
-            key={index}
-            ref={(input) => inputRefs.current[index] = input}
-            onChange={(e) => handleLocalInputChange(index, e.target.value)}
-          />
+  const handleLocalInputChange = (index: number, value: string) => {
+    const newAnswers = [...localAdditionalAnswers];
+    newAnswers[index] = value;
+    setLocalAdditionalAnswers(newAnswers);
+  };
+
+  AdditionalQuestions.displayName = 'AdditionalQuestions';
+  
+  return (
+    <div className="container mx-auto px-4">
+      <form onSubmit={handleAdditionalSubmit}>
+        {generatedQuestions.map((question, index) => (
+          <div key={index}>
+            <label htmlFor={`additional-question-${index + 1}`}>{question}</label>
+            <TextareaAutosize
+              id={`additional-question-${index + 1}`}
+              className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
+              value={localAdditionalAnswers[index]}
+              key={index}
+              ref={inputRefs.current[index]}
+              onChange={(e) => handleLocalInputChange(index, e.target.value)}
+              minRows={1}
+            />
+          </div>
+        ))}
+        <div className={styles.buttonWrapper}>
+          <button type="submit" className="shadow__btn mt-4">
+            Submit Additional Answers
+          </button>
         </div>
-      ))}
-      <div className={styles.buttonWrapper}>
-        <button type="submit" className="shadow__btn mt-4">
-          Submit Additional Answers
-        </button>
-      </div>
-    </form>
-  </div>
-);
+      </form>
+    </div>
+  );
 });
+
+
+
   
   const GeneralQuestions = () => {
     const generalQuestions = [
@@ -248,30 +264,43 @@ return (
   return (
     <div>
       <Header />
-      {isLoading ? (
-        <div className={styles.loader}>Thinking...</div>
-      ) : (
+      {isLoading ? 
+  <div className={styles.spinnerContainer}>
+  <div className={styles.spinner}></div>
+  <div className={styles.loader}>
+    <p>thinking of </p>
+    <div className={styles.words}>
+      <div className={styles.word}><span className={styles.gradient}>questions</span></div>
+      <div className={styles.word}><span className={styles.gradient}>ideas</span></div>
+      <div className={styles.word}><span className={styles.gradient}>perspectives</span></div>
+      <div className={styles.word}><span className={styles.gradient}>insights</span></div>
+      <div className={styles.word}><span className={styles.gradient}>questions</span></div>
+    </div>
+  </div>
+</div>
+
+        : 
         <div className="container mx-auto px-4">
           {!isAssessmentSubmitted && !isLoading && (
             <>
-              <p className="text-center text-sm text-gray-400 mt-4 mb-6">
-                The help we&apos;re able to provide depends entirely on how much you let us know! The more details you share, the better our help will be. Please share as much as you&apos;re comfortable with.
+              <p className="text-center font-semibold mt-4 mb-6">
+                Our advice depends entirely on what you let us know! The more details you share, the better our help will be. Your answers and advice are not stored or viewed by our team, so please share as much as you&apos;re comfortable with. 
               </p>
               <form onSubmit={handleSubmit}>
                 {initialQuestions.map((question, index) => (
                   <div key={index}>
                     <label htmlFor={`question-${index + 1}`}>{question}</label>
-                    <input
-                      type="text"
+                    <TextareaAutosize
                       id={`question-${index + 1}`}
                       className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2"
                       value={answers[index]}
                       onChange={(e) => handleInputChange(index, e.target.value, "initial")}
+                      minRows={1}
                     />
                   </div>
                 ))}
-                <div className={styles.buttonWrapper} justify-center>
-                  <button type="submit" className="shadow__btn mt-4 mb-6">
+                <div className={styles.buttonWrapper} >
+                  <button type="submit" className="shadow__btn mt-4 mb-6 justify-center">
                     Analyze My Answers
                   </button>
                 </div>
@@ -279,39 +308,39 @@ return (
             </>
           )}
         </div>
-      )}
-    
-         {isAssessmentSubmitted && (
-      <div>
-        {showInitialAssessment && (
-          <>
-            <h2 className="text-2xl font-bold text-center mb-1">MindMap Analysis</h2>
-            <p className="text-xl mb-4 text-center">This is just a first guess to see where we stand. If we get this right, we&apos;ll ask you a few more questions to get a better idea of how we can help.</p>
-            <p className="bg-slate-900 {plan} text-white border border-gray-700 px-4 py-2 rounded mb-4 text-center">{plan}</p>
-            <h2 className="text-2xl font-bold mt-6 text-center">Is this assessment accurate?</h2>
-            <div className={`${styles.buttonWrapper} ${styles.yesNoButtons}`}>
-  <button
-    className="bg-green-500 text-white px-4 py-2 rounded mt-4 mr-4"
-    onClick={async () => {
-      setIsLoading(true);
-      setIsAssessmentConfirmed(true);
-      setShowInitialAssessment(false);
-      await generateAdditionalQuestions(plan);
-      setIsLoading(false);
-      setShowAdditionalQuestions(true);
-    }}       
-  >
-    Yes
-  </button>
-  <button
-    className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-    onClick={() => {
-      setIsLoading(true);
-      setIsAssessmentConfirmed(false);
-      setShowInitialAssessment(false);
-      setIsLoading(false);
-    }}    
-  >
+      }
+  
+      {isAssessmentSubmitted && (
+        <div>
+          {showInitialAssessment && (
+            <>
+              <h2 className="text-2xl font-bold text-center mb-2">MindMap Analysis</h2>
+              <p className="text-xl mb-4 text-center">This is a first guess to see where we stand. If this is right, we&apos;ll ask you a few more questions to get a better idea of how we can help.</p>
+              <p className={`bg-slate-900 ${plan} text-white border border-gray-700 px-4 py-2 rounded mb-4 text-center`}>{plan}</p>
+              <h2 className="text-2xl font-bold mt-6 text-center">Is this assessment accurate?</h2>
+              <div className={`${styles.buttonWrapper} ${styles.yesNoButtons}`}>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded mt-4 mr-4"
+                  onClick={async () => {
+                    setIsLoading(true);
+                    setIsAssessmentConfirmed(true);
+                    setShowInitialAssessment(false);
+                    await generateAdditionalQuestions(plan);
+                    setIsLoading(false);
+                    setShowAdditionalQuestions(true);
+                  }}       
+                  >
+                  Yes
+                </button>
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+                  onClick={() => {
+                    setIsLoading(true);
+                    setIsAssessmentConfirmed(false);
+                    setShowInitialAssessment(false);
+                    setIsLoading(false);
+                  }}    
+                >
     No
     </button>
 </div>
@@ -325,9 +354,13 @@ return (
   <div className="container mx-auto px-4">
     <div className="flex justify-center">
     </div>
-  </div>
-)}
+      </div>
+    )}
   </div>
 )};
+
+export async function getServerSideProps() {
+  return { props: {} };
+}
 
 export default Home;
