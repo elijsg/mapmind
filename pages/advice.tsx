@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { GlobalStateContext } from '../context/GlobalStateContext';
-import { extractRelevantTopics } from './extract';
-import { searchTopics } from './search';
+import { extractRelevantTopics } from '../functions/extract';
+import { searchTopics } from '../functions/search';
 import axios from 'axios';
 import Header from '../components/Header';
 import styles from '../CSS/app.module.css';

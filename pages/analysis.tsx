@@ -24,6 +24,11 @@ const initialQuestions = [
   "Think about a person you admire or who inspires you. What qualities do they possess that you would like to cultivate in yourself?",
 ];
 
+type GlobalStateContextType = {
+  advice: string;
+  setAdvice: React.Dispatch<React.SetStateAction<string>>;
+};
+
 function Home(): JSX.Element {
   console.log('Rendering Home component...');
   const [answers, setAnswers] = useState<Array<string>>(Array(10).fill(''));
@@ -41,9 +46,15 @@ function Home(): JSX.Element {
   const [showActionableAdvice, setShowActionableAdvice] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [initialAssessment, setInitialAssessment] = useState('');
-  const { setAdvice } = useContext(GlobalStateContext);
+  const { setAdvice, advice } = useContext<GlobalStateContextType>(GlobalStateContext);
   const router = useRouter();
 
+  useEffect(() => {
+    if (advice) {
+      localStorage.setItem('advice', advice);
+    }
+  }, [advice]);
+  
   useEffect(() => {
     console.log('Home component rerendered');
   }, []);
