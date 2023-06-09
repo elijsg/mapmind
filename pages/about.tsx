@@ -50,15 +50,22 @@ const AboutPage = () => {
               Thank you for choosing MindMap. Let&apos;s work together to achieve
               your goals and create a better future!
             </p>
-          </div>
-          <Link href="/privacypolicy">
-          <button className="mt-4 font-bold focus:outline-none">Privacy Policy</button>
-          </Link>
-        </div>
-        </div>
-      <Footer className="bg-slate-900 text-white h-14" />
-    </div>
-  );
+            </div>
+  <div>
+    <Link href="/privacypolicy">
+      <button className="mt-4 font-bold focus:outline-none">Privacy Policy</button>
+    </Link>
+    <span className="mx-2">|</span>
+    <Link href="/termsofservice">
+      <button className="mt-4 font-bold focus:outline-none">Terms of Service</button>
+    </Link>
+  </div>
+</div>
+</div>
+<Footer className="bg-slate-900 text-white h-14" />
+</div>
+);
+
 };
 
 export default AboutPage;

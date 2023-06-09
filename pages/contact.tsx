@@ -39,7 +39,7 @@ const ContactPage: React.FC = () => {
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex-grow container mx-auto px-4">
-        <div className="w-1/2 mx-auto">
+        <div className="mx-auto">
           <h2 className="text-2xl font-bold text-center mb-4 mt-8">Contact</h2>
           <p className="text-center mb-4">We value your feedback! Please share any comments or concerns below and we will address them the best we can.</p>
           <form onSubmit={handleFormSubmit} className="flex flex-col items-center">
@@ -66,7 +66,7 @@ const ContactPage: React.FC = () => {
               value={feedback}
               onChange={e => setFeedback(e.target.value)}
               placeholder="Your Feedback"
-              className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2 h-80 focus:bg-slate-900 focus:text-white"
+              className="bg-slate-900 text-white border border-gray-700 rounded px-4 py-1 w-full mt-2 h-72 focus:bg-slate-900 focus:text-white"
               required
             />
             <button

@@ -143,7 +143,7 @@ function Home(): JSX.Element {
       const additionalQA = additionalAnswers.map((answer, index) => `Q${index + 11}: ${generatedQuestions[index]}\nA${index + 11}: ${answer}`).join('\n');
 
       const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo", //CHANGE BACK TO 4
+        model: "gpt-4",
         temperature: 0.95,
         max_tokens: 300,
         messages: [
@@ -151,7 +151,7 @@ function Home(): JSX.Element {
           { role: "user", content: `Analyze my answers to an initial set of questions:\n\n${initialQA}` },
           { role: "user", content: `Consider the fact that I agree with your initial assessment which was generated based on my answers to these initial questions: "${initialAssessment}"` },
           { role: "user", content: `Analyze my answers to the additional questions:\n\n${additionalQA}` },
-          { role: "system", content: "Based on my answers to both sets of questions and my agreement with your assessment, what are some actionable steps I can take to improve in the 3 the areas identified in the initial assessment?" },
+          { role: "system", content: "Based on my answers to both sets of questions and my agreement with your assessment, what are some actionable steps I can take to improve in the 3 the areas identified in the initial assessment? Please make your answer as personalized as possible, so I feel like you really took my answers into consideration." },
         ],
       });
 
@@ -344,16 +344,13 @@ const AdditionalQuestions = memo(() => {
                   Yes
                 </button>
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-                  onClick={() => {
-                    setIsLoading(true);
-                    setIsAssessmentConfirmed(false);
-                    setShowInitialAssessment(false);
-                    setIsLoading(false);
-                  }}    
-                >
-    No
-    </button>
+  className="bg-red-500 text-white px-4 py-2 rounded mt-4"
+  onClick={() => {
+    router.push('/contact');
+  }}    
+>
+  No
+</button>
 </div>
           </>
         )}

@@ -99,7 +99,7 @@ return (
           Get Personalized Support
         </button>
       </div>
-      <p className="text-center font-semibold mt-20">Have questions, comments, or anything else or your mind? Please let us know!</p>
+      <p className="text-center font-semibold mt-20">Have questions, comments, or anything else or your mind? Please let us know below!</p>
       <div className="flex justify-center mt-4">
         <button
           className={`bg-blue-500 text-white px-4 py-2 rounded ${styles.buttonWrapper} feedback__btn`}
@@ -108,9 +108,11 @@ return (
           Send Feedback
         </button>
       </div>
-      {topics.map((topic, index) => (
-        <p key={index}>{topic}</p>
-      ))}
+      {/* 
+{topics.map((topic, index) => (
+  <p key={index}>{topic}</p>
+))}
+*/}
       {showSearchResultsPopup && (
         <div>
           {searchResults.map((result, index) => (
@@ -123,7 +125,7 @@ return (
       <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
         <form
           onSubmit={handleEmailSubmit}
-          className="bg-slate-900 text-white border border-gray-700 rounded p-6 w-1/2 max-w-lg"
+          className="bg-slate-900 text-white border border-gray-700 rounded p-6 w-full max-w-lg"
         >
           <h2 className="text-xl text-center mb-4">Get resources that help you <b><i>actually</i></b> reach your goals.</h2>
           <p className="mb-4 text-center">Enter your email below to get a copy of your personalized advice and a list of resources to help you hit your goals.</p>

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState, useRef} from "react";
+import React, { MouseEvent, useState } from "react";
 import styles from '../CSS/LandingPage.module.css';
 import Footer from "../components/Footer";
 import { useRouter } from "next/router";
@@ -7,25 +7,13 @@ import Header from "../components/Header";
 const Home: React.FC = () => {
   const [isFading, setIsFading] = useState(false);
   const router = useRouter();
-  const timerId = useRef<NodeJS.Timeout | null>(null);
 
   const handleClick = (e: MouseEvent) => {
     setIsFading(true);
-    if (timerId.current) {
-      clearTimeout(timerId.current);
-    }
-    timerId.current = setTimeout(() => {
+    setTimeout(() => {
       router.push("/analysis");
     }, 1000);
   };
-
-  React.useEffect(() => {
-    return () => {
-      if (timerId.current) {
-        clearTimeout(timerId.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex flex-col h-screen">
@@ -38,7 +26,7 @@ const Home: React.FC = () => {
           }}
         >
           <div className="self-center">
-            <p className="text-[50px] font-bold mb-3">
+            <p className="text-[50px] font-extrabold mb-3">
               Get better at anything.
             </p>
             <p className="text-xl mb-6">
