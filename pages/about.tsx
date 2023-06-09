@@ -56,7 +56,7 @@ const AboutPage = () => {
       <button className="mt-4 font-bold focus:outline-none">Privacy Policy</button>
     </Link>
     <span className="mx-2">|</span>
-    <Link href="/termsofservice">
+    <Link href="/tos">
       <button className="mt-4 font-bold focus:outline-none">Terms of Service</button>
     </Link>
   </div>
