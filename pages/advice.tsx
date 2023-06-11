@@ -16,6 +16,8 @@ const AdvicePage = () => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResultsPopup, setShowSearchResultsPopup] = useState(false);
   const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+
 
   useEffect(() => {
     if (globalState.advice) {
@@ -77,6 +79,7 @@ const handleEmailSubmit = async (e: React.FormEvent) => {
     });
     
     console.log(response.data.message);
+    setIsEmailSent(true); 
   } catch (error) {
     console.log('Error sending advice email:', error);
   }
@@ -155,6 +158,25 @@ return (
             </button>
           </div>
         </form>
+      </div>
+    )}
+        {isEmailSent && (
+      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="bg-slate-900 text-white border border-gray-700 rounded p-6 w-full max-w-lg">
+          <h2 className="text-xl text-center mb-4">Email Sent!</h2>
+          <p className="mb-4 text-center">Your advice and resources have been sent to your email.</p>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+              onClick={() => {
+                setIsEmailSent(false);
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
       </div>
     )}
     <Footer className="bg-slate-900 text-white h-14" />
