@@ -11,10 +11,10 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap"
-            rel="stylesheet"
-          />
+        <link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap"
+  rel="stylesheet"
+/>
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-GPNVR5RKF8"
             strategy="afterInteractive"

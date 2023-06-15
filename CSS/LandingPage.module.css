@@ -82,3 +82,8 @@
   justify-content: center }
 .container p {
   margin: 0 }
+
+  .extrabold {
+    font-weight: 900;
+  }
+  

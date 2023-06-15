@@ -26,9 +26,9 @@ const Home: React.FC = () => {
           }}
         >
           <div className="self-center">
-            <p className="text-[50px] font-extrabold mb-3">
-              Get better at anything.
-            </p>
+          <p className="text-[50px] font-extrabold mb-3 extrabold">
+  Get better at anything.
+</p>
             <p className="text-xl mb-6">
               Receive personalized guidance on any area of life in a matter of minutes.
             </p>
