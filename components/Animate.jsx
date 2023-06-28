@@ -5,7 +5,7 @@ import hsl from "hsl-to-hex";
 import debounce from "debounce";
 import { KawaseBlurFilter } from "@pixi/filter-kawase-blur";
 import useDeviceSize from "./useDeviceSize";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function random(min, max) {
   return Math.random() * (max - min) + min;
@@ -148,26 +148,35 @@ class Orb {
 
 function SphereCanvas() {
   const app = useApp();
-
   const [colorPalette] = useState(() => new ColorPalette());
+
+  useEffect(() => {
+    if (app) {
+      app.stage.filters = [new KawaseBlurFilter(30, 10, true)];
+      const orbs = [];
   
-  if (!app) return null;
-  app.stage.filters = [new KawaseBlurFilter(30, 10, true)];
+      for (let i = 0; i < 10; i++) {
+        const orb = new Orb(colorPalette.randomColor());
+        app.stage.addChild(orb.graphics);
+        orbs.push(orb);
+      }
 
-  const orbs = [];
+      const tick = () => {
+        orbs.forEach((orb) => {
+          orb.update();
+          orb.render();
+        });
+      };
 
-  for (let i = 0; i < 10; i++) {
-    const orb = new Orb(colorPalette.randomColor());
-    app.stage.addChild(orb.graphics);
-    orbs.push(orb);
-  }
+      app.ticker.add(tick);
 
-  useTick(() => {
-    orbs.forEach((orb) => {
-      orb.update();
-      orb.render();
-    });
-  });
+      return () => {
+        app.ticker.remove(tick);
+      };
+    }
+  }, [app, colorPalette]);
+
+  return null;
 }
 
 const AnimateSphereBackground = () => {
