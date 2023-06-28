@@ -1,0 +1,121 @@
+.comparisonContainer {
+  width: 100%;
+  position: relative;
+  max-width: 1140px;
+  max-height: 640px;
+  margin-top: 4rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Aligns the children to start at the same point */
+  padding: 4rem;
+  background: rgba(255, 255, 255, 0.3715);
+  box-shadow: 0 0.75rem 2rem 0 rgba(0, 0, 0, 0.1);
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.125);
+}
+
+.comparisonSubContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 45%; /* Slightly less than 50% to make space for divider */
+}
+
+.title {
+  font-size: 1.8em;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.body {
+  font-weight: bold;
+  text-align: center;
+  opacity: 0;
+}
+
+li.emoji {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+li.regular {
+  font-weight: normal;
+  font-size: 1em;
+  padding-bottom: .5rem;
+}
+
+
+.fadeIn {
+  animation: fadeIn 2s forwards; 
+}
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+
+.comparisonDivider {
+  border-left: 1px solid rgba(0, 0, 0, 0.25); /* Increase border width to make the line thicker */
+  border-radius: 10%; 
+  height: 80%; /* Makes sure the line spans the full height of the parent */
+  position: absolute;
+  left: 50%; /* Positions it at the center of the parent */
+  z-index: 1; /* Ensures it's above the other elements */
+}
+
+@media only screen and (max-width: 1140px) {
+  .comparisonSubContainer {
+    padding: 10px;
+  }
+}
+
+@media only screen and (max-width: 840px) {
+  .comparisonSubContainer {
+    padding: 5px;
+  }
+
+  .title {
+    font-size: 1em;
+  }
+
+  .body {
+    font-size: 0.875em;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .comparisonSubContainer {
+    padding: 2.5px;
+  }
+
+  .title {
+    font-size: 0.875em;
+  }
+
+  .body {
+    font-size: 0.75em;
+  }
+}
+
+.imageUp {
+  margin-top: -90px;
+  margin-bottom: 40px; /* adjust this value to your preference */
+}
+
+.imageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.smallImage {
+  object-fit: contain;
+}
+
+.leftImageWrapper {
+  display: flex;
+  justify-content: center;
+  width: 400px; /* Adjust this as per your requirement */
+  height: 400px; /* Adjust this as per your requirement */
+}

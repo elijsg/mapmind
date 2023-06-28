@@ -1,0 +1,57 @@
+.header {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; /* New */
+  width: 100%;
+  padding: 0 12rem; /* Changed */
+  z-index: 10;
+  font-family: var(--font-family);
+}
+  
+.title {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 1.875rem;
+  font-weight: 600;
+}
+  
+.beta {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  transform: translateY(-50%);
+  font-size: .875rem;
+  margin-left: 4px;
+}
+  
+.btn {
+    width: 20%; /* Changed */
+    height: 2.5rem;
+    display: flex;
+    justify-content: center; /* Changed */
+    align-items: center; /* Changed */
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff; /* White color, replace with your light color */
+    background: #333; /* Dark gray color, replace with your dark color */
+    border: none;
+    border-radius: 0.5rem;
+    transition: transform 150ms ease;
+    outline-color: hsl(var(--hue), 95%, 50%);
+  }
+  
+  .btn:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+  }
+  
+  .btn.transparent {
+    background: transparent;
+    color: #333; /* Dark gray color, replace with your dark color */
+    border: 2px solid #333; /* Dark gray color, replace with your dark color */
+    padding: 0 1rem; /* New */
+    margin-right: 0.75rem;
+  }
+  

@@ -5,7 +5,7 @@
   border: 1px solid rgba(98, 131, 221, 0);
   font-size: 14px;
   font-weight: 600;
-  background: linear-gradient(37deg, rgba(121,224,194,1) 1%, rgba(67,175,216,1) 16%, rgba(98,131,221,1) 30%, rgba(224,90,142,1) 41%, rgba(228,99,115,1) 53%, rgba(239,147,111,1) 65%, rgba(242,188,99,1) 74%, rgba(244,114,78,1) 83%, rgba(233,69,113,1) 100%);
+  background: linear-gradient(37deg, rgba(121,224,194,1) 1%, rgba(67,175,216,1) 16%, rgba(98,131,221,1) 30%, rgba(224,90,142,1) 41%, rgba(228,99,115,1) 53%, rgba(239,147,111,1) 65%, rgb(242, 188, 99) 74%, rgba(244,114,78,1) 83%, rgba(233,69,113,1) 100%);
   background-size: 1800% 1800%;
 
   -webkit-animation: rainbow 18s ease infinite;
@@ -61,7 +61,7 @@
   padding: 10px 20px;
   border: none;
   font-size: 12px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   color: #fff;
   border-radius: 7px;
   font-weight: 700;

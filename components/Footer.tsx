@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image'
+import styles from '../CSS/Footer.module.css';
 
 interface FooterProps {
   className?: string;
@@ -7,7 +8,7 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ className }) => {
   return (
-    <footer className={`bg-transparent text-white py-4 bottom-0 left-0 w-full ${className}`}>
+    <footer className={styles.footer}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <div>
           <Link href="/about" passHref>
@@ -18,7 +19,7 @@ const Footer: React.FC<FooterProps> = ({ className }) => {
             <button className="font-bold focus:outline-none">Contact</button>
           </Link>
         </div>
-        <div className="flex items-center">
+        <div className={styles.icons}>
           <a href="https://twitter.com/mindmapapp" target="_blank" rel="noopener noreferrer" className="mx-2">
             <Image src="/images/twitter-icon.svg" alt="Twitter" width={24} height={24} />
           </a>

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, FormEvent, memo, useEffect, useRef, useContext} from 'react';
-import styles from '../CSS/app.module.css';
+import styles from '../CSS/analysis.module.css';
 import { Configuration, OpenAIApi } from "openai";
 import Header from '../components/Header';
 import { useRouter } from 'next/router';

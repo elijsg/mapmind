@@ -1,0 +1,83 @@
+.socialProofOverlay {
+  width: 100%;
+  max-width: 1140px;
+  max-height: 640px;
+  padding: 4rem;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.3715);
+  box-shadow: 0 0.75rem 2rem 0 rgba(0, 0, 0, 0.1);
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  margin-top: 4rem;
+}
+
+.quoteContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.quoteBlock {
+  flex: 1;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.quote {
+  font-size: 1em;
+  font-weight: bold;
+  color: var(--dark-color);
+  flex-grow: 1;
+}
+
+.author {
+  font-size: 1em;
+  color: var(--dark-color);
+  background-image: linear-gradient(
+    45deg,
+    var(--base) 25%,
+    var(--complimentary2)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+}
+
+@media only screen and (max-width: 1140px) {
+  .quoteBlock {
+    padding: 10px;
+  }
+}
+
+@media only screen and (max-width: 840px) {
+  .quoteBlock {
+    padding: 5px;
+  }
+
+  .quote {
+    font-size: 1em;
+  }
+
+  .author {
+    font-size: 0.875em;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .quoteBlock {
+    padding: 2.5px;
+  }
+
+  .quote {
+    font-size: 0.875em;
+  }
+
+  .author {
+    font-size: 0.75em;
+  }
+}

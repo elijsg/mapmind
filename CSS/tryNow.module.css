@@ -1,0 +1,134 @@
+.tryNowContainer {
+    width: 100%;
+    max-width: 1140px;
+    max-height: 640px;
+    padding: 4rem;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3715);
+    box-shadow: 0 0.75rem 2rem 0 rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    margin-top: 4rem;
+  }
+  
+  .tryNowSubContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  
+  .tryNowBlock {
+    flex: 1;
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .tryNowBlockRight {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.3715);
+    box-shadow: 0 0.75rem 2rem 0 rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.125);
+  }
+
+  .boldWord {
+    font-weight: bold;
+}
+
+  .tryNowBlockLeft {
+    flex: 1;
+    padding: 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .tryNowText {
+    font-size: 1em;
+    color: var(--dark-color);
+    flex-grow: 1;
+  }
+
+  .tryNowTextRight {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: var(--dark-color);
+    flex-grow: 1;
+    padding: 1rem;
+    margin-top: 4rem;
+  }
+
+  .arrowAndButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4rem;
+}
+
+
+
+  .gradientWord {
+    background-image: linear-gradient(
+        45deg,
+        var(--base) 25%,
+        var(--complimentary2)
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      -moz-background-clip: text;
+      -moz-text-fill-color: transparent;
+  }
+  
+  .btn {
+    width: auto;
+    height: 2.5rem;
+    display: flex;
+
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--light-color);
+    background: var(--dark-color);
+    border: none;
+    margin-right: 0; 
+    border-radius: 0.5rem;
+    transition: transform 150ms ease;
+    text-decoration: none;
+    outline-color: hsl(var(--hue), 95%, 50%);
+    padding-left: 4rem;
+    margin-top: 1rem;
+    padding-right: 4rem;
+}
+
+  
+  .btn:hover {
+    transform: scale(1.05);
+    cursor: pointer;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .tryNowBlock {
+      padding: 10px;
+    }
+  
+    .tryNowText {
+      font-size: 1em;
+    }
+  
+    .btn {
+      width: 100%;
+      font-size: 0.75rem;
+    }
+  }
+  

@@ -2,7 +2,7 @@ const withTM = require("next-transpile-modules")(["langchain"]);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   serverRuntimeConfig: {
     customServer: true,
   },
